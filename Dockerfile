@@ -8,9 +8,11 @@
 # outdated PostgreSQL library (postgresql-15) that the app does not need and
 # that has fixable high-severity CVEs. npm is upgraded because the npm bundled
 # with the image has vulnerable dependencies (brace-expansion, pacote, ...).
+# The major version is pinned: npm@latest can drop support for the base image's
+# Node version (npm 12 rejects Node 25), which breaks the build.
 ###################################################
 FROM node:22-slim AS base
-RUN npm install -g npm@latest && npm cache clean --force
+RUN npm install -g npm@11 && npm cache clean --force
 WORKDIR /usr/local/app
 
 ################## CLIENT STAGES ##################
