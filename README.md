@@ -1,12 +1,12 @@
-# pr2-docker-fix
+# pr3-filter
 
-**적용 단계**: [실습 2] ④ Issue #2 브랜치 커밋 (`scripts/lab2_ci_protection.sh`)  
-**연관 Issue**: Issue #2 (`issues/2-bug.md`) / PR #5
+**적용 단계**: [실습 3] ① Issue #3 브랜치 커밋 (`scripts/lab3_feature_conflict.sh`)  
+**연관 Issue**: Issue #3 (`issues/3-feat.md`) / PR #7
 
 ---
 
 ## 폴더 개요
-새로 clone한 환경에서 도커 빌드가 실패하던 버그(누락된 `requirements-dev.txt`)를 수정하고, 프로덕션 컨테이너 이미지의 보안(비루트 실행)과 안정성(HEALTHCHECK)을 강화하기 위한 파일 모음입니다.
+클라이언트에서 할 일 목록을 상태별로 나누어 볼 수 있도록, **완료 여부(`?completed=true|false`)로 아이템을 필터링하는 백엔드 API 기능**과 해당 기능을 검증하는 단위 테스트 모음입니다.
 
 ---
 
@@ -14,8 +14,6 @@
 
 | 파일 경로 | 변경 내용 및 목적 |
 | :--- | :--- |
-| **`Dockerfile`** | 컨테이너 빌드 및 보안 강화:<br>1. `requirements-dev.txt` 파일을 컨테이너 내부로 올바르게 복사하도록 빌드 단계 수정<br>2. 최종 운영 이미지(`target: final`)를 루트(root) 대신 **비루트 사용자(`USER 10001`)**로 실행하도록 보안 강화<br>3. 컨테이너 헬스체크(`HEALTHCHECK`) 추가 (`/api/greeting` 엔드포인트 헬스체크) |
-| **`backend/requirements-dev.txt`** | **[신규 추가]** 테스트 및 개발에만 필요한 패키지(`pytest`, `pytest-asyncio`, `httpx`, `pytest-cov`, `ruff`)를 정의하여 운영 이미지에 불필요한 테스트 패키지가 포함되지 않도록 분리 |
-| **`backend/requirements.txt`** | 운영 런타임에 꼭 필요한 패키지(`fastapi`, `uvicorn`, `aiomysql`, `aiosqlite`)만 남기도록 경량화 |
-| **`.github/workflows/ci.yml`** | CI 워크플로의 backend 의존성 설치 단계를 `requirements-dev.txt` 기준으로 설치하도록 업데이트 |
+| **`backend/src/routes/items.py`** | `GET /api/items` 및 `GET /items` 라우터 함수에 선택적 쿼리 파라미터 `completed: Optional[bool] = None` 추가:<br>- `?completed=true`: 완료된 항목만 반환<br>- `?completed=false`: 미완료된 항목만 반환<br>- 생략 시: 전체 항목 반환 (기존 동작 유지) |
+| **`backend/spec/routes/test_filterItems.py`** | **[신규 테스트 추가]** 필터링 요구사항 4가지를 검증하는 단위 테스트:<br>1. `completed=true` 필터링 검증<br>2. `completed=false` 필터링 검증<br>3. 파라미터 생략 시 전체 반환 검증<br>4. 잘못된 파라미터 값(`?completed=abc`) 입력 시 FastAPI 유효성 검사 에러(422) 검증 |
 
