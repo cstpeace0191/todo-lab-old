@@ -9,7 +9,7 @@
 # that has fixable high-severity CVEs. npm is upgraded because the npm bundled
 # with the image has vulnerable dependencies (brace-expansion, pacote, ...).
 ###################################################
-FROM node:22-slim AS base
+FROM node:25-slim AS base
 RUN npm install -g npm@latest && npm cache clean --force
 WORKDIR /usr/local/app
 
