@@ -169,7 +169,10 @@ async def test_edit_rejects_empty_or_too_long_name(bad_name):
 
 @pytest.mark.asyncio
 async def test_edit_trims_name_whitespace():
-    with patch("src.persistence.get_item", new_callable=AsyncMock, side_effect=[ITEM, ITEM]),             patch("src.persistence.update_item", new_callable=AsyncMock) as mock_update:
+    with (
+        patch("src.persistence.get_item", new_callable=AsyncMock, side_effect=[ITEM, ITEM]),
+        patch("src.persistence.update_item", new_callable=AsyncMock) as mock_update,
+    ):
         async with await _client() as ac:
             await ac.put("/api/items/1", json={"name": "  앞뒤 공백  "})
 

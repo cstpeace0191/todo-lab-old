@@ -1,13 +1,25 @@
 [project]
 name = "backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "FastAPI backend for the Getting Started Todo App"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "asyncpg>=0.30.0",
+    "aiomysql>=0.3.2",
     "aiosqlite>=0.22.1",
-    "anthropic>=2.13.0",
     "fastapi>=0.163.1",
     "uvicorn>=0.54.0",
 ]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "B"]   # pycodestyle · pyflakes · bugbear
+
+[tool.ruff.lint.per-file-ignores]
+"src/main.py" = ["E402"]   # mimetypes 등록 후 import (의도된 순서)
+
+[tool.coverage.run]
+omit = ["src/persistence/mysql.py"]   # MySQL 경로는 compose 통합 테스트에서 확인

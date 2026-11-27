@@ -24,7 +24,10 @@ async def test_it_stores_item_correctly():
         "due_time": None,
     }
 
-    with patch("src.routes.items.uuid.uuid4", return_value=item_id),             patch("src.ai.classify_item", new_callable=AsyncMock, return_value=CLASSIFICATION):
+    with (
+        patch("src.routes.items.uuid.uuid4", return_value=item_id),
+        patch("src.ai.classify_item", new_callable=AsyncMock, return_value=CLASSIFICATION),
+    ):
         with patch("src.persistence.store_item", new_callable=AsyncMock) as mock_store:
             result = await add_item(ItemCreate(name=name))
 
@@ -48,7 +51,10 @@ async def test_post_items_api_endpoint():
         "due_time": None,
     }
 
-    with patch("src.routes.items.uuid.uuid4", return_value=item_id),             patch("src.ai.classify_item", new_callable=AsyncMock, return_value=CLASSIFICATION):
+    with (
+        patch("src.routes.items.uuid.uuid4", return_value=item_id),
+        patch("src.ai.classify_item", new_callable=AsyncMock, return_value=CLASSIFICATION),
+    ):
         with patch("src.persistence.store_item", new_callable=AsyncMock) as mock_store:
             transport = ASGITransport(app=app)
             async with AsyncClient(transport=transport, base_url="http://test") as ac:
@@ -74,7 +80,10 @@ async def test_it_stores_item_without_classification_when_ai_unavailable():
         "due_time": None,
     }
 
-    with patch("src.routes.items.uuid.uuid4", return_value=item_id),             patch("src.ai.classify_item", new_callable=AsyncMock, return_value=None):
+    with (
+        patch("src.routes.items.uuid.uuid4", return_value=item_id),
+        patch("src.ai.classify_item", new_callable=AsyncMock, return_value=None),
+    ):
         with patch("src.persistence.store_item", new_callable=AsyncMock) as mock_store:
             result = await add_item(ItemCreate(name=name))
 

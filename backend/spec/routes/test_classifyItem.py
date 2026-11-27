@@ -38,7 +38,15 @@ async def test_classify_endpoint_updates_item():
     assert response.json() == CLASSIFIED
     assert mock_update.call_args[0] == (
         "1234",
-        {"name": "보고서 작성", "completed": False, "category": "work", "priority": "high", "registered": False, "due_date": None, "due_time": None},
+        {
+            "name": "보고서 작성",
+            "completed": False,
+            "category": "work",
+            "priority": "high",
+            "registered": False,
+            "due_date": None,
+            "due_time": None,
+        },
     )
 
 
