@@ -7,6 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
     "aiomysql>=0.3.2",
     "aiosqlite>=0.22.1",
+    "anthropic>=2.14.0",
     "fastapi>=0.163.1",
     "uvicorn>=0.54.0",
 ]
@@ -22,4 +23,4 @@ select = ["E", "F", "B"]   # pycodestyle · pyflakes · bugbear
 "src/main.py" = ["E402"]   # mimetypes 등록 후 import (의도된 순서)
 
 [tool.coverage.run]
-omit = ["src/persistence/mysql.py"]   # MySQL 경로는 compose 통합 테스트에서 확인
+omit = ["src/persistence/postgres.py"]   # Postgres 경로는 compose 통합 테스트에서 확인

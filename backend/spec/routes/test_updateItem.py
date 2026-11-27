@@ -5,7 +5,18 @@ from src.main import app
 from src.models import ItemUpdate
 from src.routes.items import update_item
 
-ITEM = {"id": "1234", "name": "New title", "completed": False}
+ITEM = {
+    "id": "1234",
+    "name": "New title",
+    "completed": False,
+    "category": None,
+    "priority": None,
+    "registered": False,
+    "due_date": None,
+    "due_time": None,
+}
+# 라우트는 payload 에 없는 필드를 기존 항목 값으로 채워 전체 필드를 저장한다
+EXPECTED_UPDATE = {k: v for k, v in ITEM.items() if k != "id"}
 
 
 @pytest.mark.asyncio
@@ -19,7 +30,7 @@ async def test_it_updates_items_correctly():
 
             assert mock_update.call_count == 1
             assert mock_update.call_args[0][0] == item_id
-            assert mock_update.call_args[0][1] == update_payload
+            assert mock_update.call_args[0][1] == EXPECTED_UPDATE
             assert result == ITEM
 
 
