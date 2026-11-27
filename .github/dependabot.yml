@@ -1,18 +1,28 @@
 version: 2
 updates:
+  # 마이너·패치는 그룹 PR 하나로 묶고, 메이저는 패키지별 개별 PR 로 받는다
+  # (메이저를 한 PR 에 섞으면 typescript 7 + typescript-eslint 처럼 서로 충돌해 통째로 실패한다)
   - package-ecosystem: pip
     directory: /backend
     schedule: { interval: weekly }
     groups:
-      python-deps: { patterns: ["*"] }
+      python-deps:
+        patterns: ["*"]
+        update-types: [minor, patch]
   - package-ecosystem: npm
     directory: /client
     schedule: { interval: weekly }
     groups:
-      npm-deps: { patterns: ["*"] }
+      npm-deps:
+        patterns: ["*"]
+        update-types: [minor, patch]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
   - package-ecosystem: docker
     directory: /
     schedule: { interval: weekly }
+    ignore:
+      # Node 메이저(LTS 전환)는 직접 판단해서 올린다. 홀수 버전(25 등)은 LTS 가 아니다
+      - dependency-name: node
+        update-types: [version-update:semver-major]
