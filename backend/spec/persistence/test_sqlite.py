@@ -268,7 +268,9 @@ async def test_it_returns_items_within_a_date_range_inclusive():
         await db.store_item({**ITEM, "id": key, "name": key, "due_date": due_date, "due_time": due_time})
     await db.store_item({**ITEM, "id": "nodate", "name": "nodate"})
     # 완료한 항목도, 등록 여부와 상관없이 범위에 들어오면 포함된다
-    await db.store_item({**ITEM, "id": "done", "name": "done", "due_date": "2026-11-24", "completed": True, "registered": True})
+    await db.store_item(
+        {**ITEM, "id": "done", "name": "done", "due_date": "2026-11-24", "completed": True, "registered": True}
+    )
 
     result = await db.get_schedule_range("2026-11-23", "2026-11-29")
 

@@ -105,7 +105,7 @@ WORKDIR /usr/local/app
 # Stage: backend-deps
 #
 # requirements.txt 의 파이썬 의존성만 설치한다 (fastapi, uvicorn, asyncpg,
-# aiosqlite, anthropic, pytest 등). backend-dev 와 final 의 공통 베이스다.
+# aiosqlite, anthropic 등 운영 의존성). backend-dev 와 final 의 공통 베이스다.
 # 이 파일만 먼저 복사하므로 requirements.txt 가 바뀌기 전까지 레이어가 캐시된다.
 ###################################################
 FROM backend-base AS backend-deps
@@ -115,8 +115,8 @@ RUN pip install -r requirements.txt
 ###################################################
 # Stage: backend-dev
 #
-# 백엔드 개발 및 테스트용. 테스트 패키지도 requirements.txt 에 포함되어
-# backend-deps 에서 이미 설치된다. main.py 는 uvicorn 을 reload=True 로
+# 백엔드 개발 및 테스트용. 테스트 패키지(pytest 등)는 requirements-dev.txt 에
+# 있으므로 여기서 추가로 설치한다 (final 이미지에는 들어가지 않음). main.py 는 uvicorn 을 reload=True 로
 # 실행하므로, compose.yaml 의 develop.watch 가 ./backend/src 를 sync 하면
 # 서버가 자동으로 다시 시작된다.
 #
@@ -125,6 +125,8 @@ RUN pip install -r requirements.txt
 #   ANTHROPIC_API_KEY              : 있으면 Claude 자동 분류 활성화
 ###################################################
 FROM backend-deps AS backend-dev
+COPY backend/requirements-dev.txt ./
+RUN pip install -r requirements-dev.txt
 COPY backend/main.py backend/pytest.ini ./
 COPY backend/spec ./spec
 COPY backend/src ./src

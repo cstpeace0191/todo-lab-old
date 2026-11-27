@@ -1,6 +1,6 @@
 import os
 import uvicorn
-from src.main import app
+from src.main import app  # noqa: F401  (uvicorn 문자열 경로 사용)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "3000"))
