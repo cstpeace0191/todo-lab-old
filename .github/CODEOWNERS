@@ -1,0 +1,6 @@
+# 마지막으로 일치하는 규칙이 적용된다
+*                     @
+/backend/             @
+/client/              @
+/Dockerfile           @
+/.github/workflows/   @
