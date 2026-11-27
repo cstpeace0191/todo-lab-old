@@ -1,0 +1,21 @@
+name: 기능 요청
+description: 새 기능이나 개선을 제안합니다
+title: "[Feat] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 배경 / 문제
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 수용 기준 (Acceptance Criteria)
+      description: 테스트로 확인할 수 있게 적어 주세요
+      placeholder: |
+        - [ ] GET /api/items?completed=true 는 완료 항목만 반환
+        - [ ] 잘못된 값은 422
+    validations:
+      required: true

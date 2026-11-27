@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 질문은 Discussions로
+    url: https://github.com/cstpeace0191/getting-started-todo-app-fastapi/discussions
+    about: 사용법 질문은 Issue 대신 Discussions에 남겨 주세요

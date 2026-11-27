@@ -1,0 +1,4 @@
+# Windows(CRLF) / Linux(LF) 혼용 방지 — 저장소에는 LF로 저장
+* text=auto eol=lf
+*.pdf binary
+*.png binary
