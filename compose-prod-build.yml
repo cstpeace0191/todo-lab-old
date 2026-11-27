@@ -8,7 +8,8 @@
 # there is some overlap in the routing rules, the proxy determines the service
 # based on the most specific rule.
 #
-# To support easier debugging and troubleshooting, the DB tool is not included; connect to the PostgreSQL database with any client.
+# To support easier debugging and troubleshooting, phpMyAdmin is also included
+# to provide a web interface to the MySQL database.
 ###################################################
 
 ###################################################
@@ -26,7 +27,7 @@ services:
   # service. Think of it like a HTTP router or a load balancer. It simply 
   # forwards requests and allows us to simulate the final version of the 
   # application where the frontend and backend are bundled together. We can 
-  # also use it to route requests to the DB tool, which won't be accessible at 
+  # also use it to route requests to phpMyAdmin, which won't be accessible at 
   # localhost, but at db.localhost.
   #
   # The image for this service comes directly from Docker Hub and is a Docker
@@ -48,8 +49,6 @@ services:
       - 443:443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      katenary.v3/ignore: "true"
 
   ###################################################
   # Service: backend
@@ -60,46 +59,26 @@ services:
   # [Docker Compose 이미지 명명 규칙 (Image Naming Convention)]:
   # 별도의 'image:' 속성을 지정하지 않고 'build:'만 선언하면, Docker Compose의
   # 기본 명명 규칙 [<프로젝트명>-<서비스명>:latest]에 따라
-  # 현재 프로젝트 디렉터리명(getting-started-todo-app-fastapi-claude)과 서비스명(backend)이 결합되어
-  # 자동으로 'getting-started-todo-app-fastapi-claude-backend:latest'라는 이름으로 빌드 및 태깅됩니다.
+  # 현재 프로젝트 디렉터리명(getting-started-todo-app)과 서비스명(backend)이 결합되어
+  # 자동으로 'getting-started-todo-app-backend:latest'라는 이름으로 빌드 및 태깅됩니다.
   #
-  # 만약 Kubernetes(KIND) 등에서 사용할 특정 이미지 이름(예: todo-lab-ai:prod)으로
+  # 만약 Kubernetes(KIND) 등에서 사용할 특정 이미지 이름(예: todo-backend:prod)으로
   # 빌드하고자 한다면 아래 주석처럼 'image:' 속성을 명시하면 됩니다:
-  #   image: todo-lab-ai:prod
+  #   image: todo-backend:prod
   ###################################################
   backend:
-    image: todo-lab-ai:prod
+    image: todo-backend:prod
     build:
       context: ./
       target: final
-    ports:
-      - 3000:3000
-    expose:
-      - 3000
     environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: todos
-      # Claude API 키 (호스트의 환경변수에서 전달, 없으면 AI 분류만 꺼짐)
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: todos    
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
-    # [Compose Watch] 'docker compose -f compose-prod-build.yml up --watch' 로 실행하면
-    # 소스가 바뀔 때마다 이미지를 자동으로 다시 빌드하고 컨테이너를 교체합니다.
-    # 운영 이미지(final)는 프론트엔드가 정적 파일로 빌드되어 들어 있으므로,
-    # 개발용처럼 파일만 sync 할 수 없고 반드시 rebuild 해야 합니다.
-    develop:
-      watch:
-        - path: ./backend/src
-          action: rebuild
-        - path: ./backend/requirements.txt
-          action: rebuild
-        - path: ./client/src
-          action: rebuild
-        - path: ./client/package.json
-          action: rebuild
     labels:
       traefik.enable: "true"
       # [HTTP 라우터 - 포트 80] (특정 IP에 종속되지 않고 localhost 및 임의의 IP/도메인 접속 지원)
@@ -115,25 +94,19 @@ services:
 
       # 백엔드 컨테이너 내부 포트 3000 바인딩
       traefik.http.services.backend-service.loadbalancer.server.port: "3000"
-      katenary.v3/map-env: |-
-        POSTGRES_HOST: '{{ include "__APP__.fullname" . }}-postgres'
 
   ###################################################
-  # Service: postgres
+  # Service: mysql
   ###################################################
-  postgres:
-    image: postgres:17
-    ports:
-      - 5432:5432
-    expose:
-      - 5432
+  mysql:
+    image: mysql:9.3
     volumes:
-      - todo-postgres-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: todos
+      - todo-mysql-data:/var/lib/mysql
+    environment: 
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: todos
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d todos"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -144,8 +117,8 @@ services:
 # Volumes
 #
 # For this application stack, we only have one volume. It's used to persist the
-# data for the PostgreSQL service. We are only going to use the default values,
+# data for the MySQL service. We are only going to use the default values,
 # hence the lack of any configuration for the volume.
 ###################################################
 volumes:
-  todo-postgres-data:
+  todo-mysql-data:
